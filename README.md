@@ -54,3 +54,6 @@ Submit `chatbot.zip` on Canvas when it's ready.
 
 The marker will run your chatbot with
 [chatbot_driver.cpp](chatbot_driver.cpp), so make sure it works!
+
+Note that if your program does not compile, you will get 0 for the entire
+assignment.
