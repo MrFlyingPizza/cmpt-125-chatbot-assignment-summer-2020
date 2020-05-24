@@ -9,21 +9,25 @@ Implement your chatbot in a class called `Chatbot` that you put in the file
 [chatbot_driver.cpp](chatbot_driver.cpp).
 
 This is an open-ended assignment: your goal is to make your chatbot as
-interesting and as intelligent as possible. Here is the basic marking scheme:
+interesting and as intelligent as possible. Here is the basic styles of
+chatbot the markers will be looking for:
 
-- Trivial or very low-effort chatbots will get low (i.e. failing) marks.
+- **Trivial or very low-effort**: Chatbots that clearly have little effort put
+  into them will get low (i.e. failing) marks.
 
-- To get a passing mark, your chatbot must at least search for keywords (e.g.
-  using linear search on the words in the input) in the users input.
+- **Keyword-style functionality**: Search the user input for particular
+  keywords, and do something different for each keyword.
 
-- To get an average mark, your program should show behaviour that is similar
-  to, or as interesting as, the behavior of the famous [Eliza
-  chatbot](https://en.wikipedia.org/wiki/ELIZA).
+- **[Eliza](https://en.wikipedia.org/wiki/ELIZA)-style functionality**: This
+  follows the style of the famous [Eliza
+  chatbot](https://en.wikipedia.org/wiki/ELIZA). This includes keyword-style
+  functionality.
 
-- To get above average marks, your program must do something original,
-  creative, or interesting that goes beyond an
-  [Eliza](https://en.wikipedia.org/wiki/ELIZA)-style chatbot. Do some
-  research: there is no shortage of idea for chatbots to be found on the web!
+- **Beyond [Eliza](https://en.wikipedia.org/wiki/ELIZA)-style functionality**:
+  Something original, creative, or interesting that clearly and non-trivially
+  goes beyond an [Eliza](https://en.wikipedia.org/wiki/ELIZA)-style chatbot.
+  Do some research: there is no shortage of idea for chatbots to be found on
+  the web!
 
 You can `#include` any files you need from the standard C++ library, but
 *don't* use any code outside the C++ library (unless you write it yourself).
