@@ -4,30 +4,29 @@ In this assignment your task is to create a
 [chatbot](https://en.wikipedia.org/wiki/Chatbot) that can, if possible, pass
 [the Turing Test](https://en.wikipedia.org/wiki/Turing_test).
 
-Implement your chatbot in a class called `Chatbot` that you put in the file
+Implement your chatbot in a class called `Chatbot` in the file
 [chatbot.h](chatbot.h). Test it using the code in
-[chatbot_driver.cpp](chatbot_driver.cpp).
+[chatbot_driver.cpp](chatbot_driver.cpp). **Important**: your code *must* work
+with [chatbot_driver.cpp](chatbot_driver.cpp)! Implement, at least, all the
+methods and constructors it requires.
 
 This is an open-ended assignment: your goal is to make your chatbot as
-interesting and as intelligent as possible. Here is the basic styles of
-chatbot the markers will be looking for:
-
-- **Trivial or very low-effort**: Chatbots that clearly have little effort put
-  into them will get low (i.e. failing) marks.
+interesting and as intelligent as possible. The markers will look for the
+following when marking:
 
 - **Keyword-style functionality**: Search the user input for particular
   keywords, and do something different for each keyword.
 
-- **[Eliza](https://en.wikipedia.org/wiki/ELIZA)-style functionality**: This
-  follows the style of the famous [Eliza
-  chatbot](https://en.wikipedia.org/wiki/ELIZA). This includes keyword-style
-  functionality.
+- **[Eliza][Eliza]-style functionality**: This follows the style of the famous
+  [Eliza chatbot][Eliza]. This includes keyword-style functionality.
 
-- **Beyond [Eliza](https://en.wikipedia.org/wiki/ELIZA)-style functionality**:
-  Something original, creative, or interesting that clearly and non-trivially
-  goes beyond an [Eliza](https://en.wikipedia.org/wiki/ELIZA)-style chatbot.
-  Do some research: there is no shortage of idea for chatbots to be found on
-  the web!
+- **Beyond [Eliza][Eliza]-style functionality**: Something original, creative,
+  or interesting that clearly and non-trivially goes beyond an
+  [Eliza][Eliza]-style chatbot. Do some research: there is no shortage of idea
+  for chatbots to be found on the web!
+
+- **Trivial or very low-effort**: Chatbots that clearly have little effort put
+  into them will get low (i.e. failing) marks.
 
 You can `#include` any files you need from the standard C++ library, but
 *don't* use any code outside the C++ library (unless you write it yourself).
@@ -39,8 +38,8 @@ features, and so on. Please follow coding style used in the notes and
 lectures.
 
 Finally, in the file [chatbot_description.txt](chatbot_description.txt), give
-a brief English description (e.g. 1 or 2 paragraphs) of how your chatbot works
-and what is interesting about it. Spelling, grammar, and formatting matter!
+an English description (e.g. 1 or 2 paragraphs) of how your chatbot works and
+what is interesting about it. Spelling, grammar, and formatting matter!
 
 
 ### What to Submit
@@ -57,3 +56,6 @@ The marker will run your chatbot with
 
 Note that if your program does not compile, you will get 0 for the entire
 assignment.
+
+
+[Eliza]: https://en.wikipedia.org/wiki/ELIZA
