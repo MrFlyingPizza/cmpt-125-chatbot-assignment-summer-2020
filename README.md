@@ -8,11 +8,18 @@ Implement your chatbot in a class called `Chatbot` in the file
 [chatbot.h](chatbot.h). Test it using the code in
 [chatbot_driver.cpp](chatbot_driver.cpp). **Important**: your code *must* work
 with [chatbot_driver.cpp](chatbot_driver.cpp)! Implement, at least, all the
-methods and constructors it requires.
+methods and constructors it requires. You can test your `Chatbot` class with
+other code if you like, but it still must work with the unmodified
+[chatbot_driver.cpp](chatbot_driver.cpp).
 
 This is an open-ended assignment: your goal is to make your chatbot as
-interesting and as intelligent as possible. The markers will look for the
-following when marking:
+interesting and as intelligent as possible. It's fine if you want to restrict
+your chatbot to a particular topic, e.g. it could just chat about hockey, or
+Harry Potter, or geography, etc. You could even try to make it useful, e.g.
+the chatbot could help you learn C++ --- maybe it could even write programs
+for you!
+
+The markers will look for the following when marking:
 
 - **Keyword-style functionality**: Search the user input for particular
   keywords, and do something different for each keyword.
@@ -39,7 +46,7 @@ lectures.
 
 Finally, in the file [chatbot_description.txt](chatbot_description.txt), give
 an English description (e.g. 1 or 2 paragraphs) of how your chatbot works and
-what is interesting about it. Spelling, grammar, and formatting matter!
+what its main features are. Spelling, grammar, and formatting matter!
 
 
 ### What to Submit
