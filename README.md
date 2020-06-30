@@ -15,9 +15,9 @@ other code if you like, but it still must work with the unmodified
 This is an open-ended assignment: your goal is to make your chatbot as
 interesting and as intelligent as possible. It's fine if you want to restrict
 your chatbot to a particular topic, e.g. it could just chat about hockey, or
-Harry Potter, or geography, etc. You could even try to make it useful, e.g.
-the chatbot could help you learn C++ --- maybe it could even write programs
-for you!
+Harry Potter, or geography, etc. You could try to make it useful, e.g. the
+chatbot could help you learn C++ --- maybe it could even write programs for
+you!
 
 The markers will look for the following when marking:
 
@@ -47,6 +47,8 @@ lectures.
 Finally, in the file [chatbot_description.txt](chatbot_description.txt), give
 an English description (e.g. 1 or 2 paragraphs) of how your chatbot works and
 what its main features are. Spelling, grammar, and formatting matter!
+**Important**: Include example transcripts of your chatbot showing the kinds
+of things it can do.
 
 
 ### What to Submit
@@ -64,5 +66,42 @@ The marker will run your chatbot with
 Note that if your program does not compile, you will get 0 for the entire
 assignment.
 
+
+### Frequently Asked Questions
+
+- **What is an [Eliza][Eliza]-style chatbot?**
+
+  [Eliza][Eliza]-style chatbot asks the user questions based on their input.
+  It looks for text patterns, such as "I like X", and responds with a matching
+  pattern, such as "Why do you like X?". For example, if the user enters "I
+  like to dream of sheep", the response would be "Why do you like to dream of
+  sheep?"
+
+  You should look for a number of different such patterns, the more the
+  better. Here are a couple of other ideas for patterns and replies:
+
+  - Given "I am X", reply with "How long have you been X?"
+
+  - Given "You are X", reply with "Why do you think I am X?"
+
+  - Given "I saw X in a dream", reply with "How does X make you feel?"
+
+  The idea is to reply to the patterns in a way that encourages the human to
+  give more details, to have them carry the conversation.
+
+  You should add at least one of your own templates.
+
+- **How can I go beyond an [Eliza][Eliza]-style chatbot?**
+
+  It's not hard to see the limitations of [Eliza][Eliza]. For example, Eliza
+  has no memory of anything you see. So one thing you might try is to remember
+  some words, and then use them in later replies.
+
+  Another problem with [Eliza][Eliza] is that it doesn't answer any useful
+  questions. You could try adding templates designed to answer practical
+  questions.
+
+  There are many other features you could add. Do some web research to get
+  ideas!
 
 [Eliza]: https://en.wikipedia.org/wiki/ELIZA
