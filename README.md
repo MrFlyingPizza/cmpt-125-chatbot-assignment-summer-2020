@@ -104,4 +104,10 @@ assignment.
   There are many other features you could add. Do some web research to get
   ideas!
 
+- **Do I have to use features not mentioned in this assignment, such as
+  dynamic memory or inheritance?**
+
+  No. You *can* use whatever C++ features you like, as long as you both
+  understand them, and they make sense to use in this program.
+
 [Eliza]: https://en.wikipedia.org/wiki/ELIZA
