@@ -6,14 +6,70 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include <ctype.h>
+
+// set of classes to identify the words in a sentence from the user
+enum word_class {
+    UNKNOWN, NOUN, PRONOUN, ARTICLE, LINKING_VERB, CONJUNCTION, POSSESSIVE, INTERROGATIVE
+};
+
+///////////////////////////////////////////////
+// language data class
+class Vocabulary {
+    public:
+
+        Vocabulary();
+
+        const std::vector<std::string>
+        pronouns {
+            "i", "you", "he", "she", "we", "they", "it", "us", "me"
+        },
+
+        articles {
+            "a", "an", "the"
+        },
+
+        linking_verbs {
+            "is", "are", "have", "be"
+        },
+
+        conjunctions {
+            "and", 
+        },
+
+        possessives {
+            "mine", "ours", "yours", "his", "hers", "its", "theirs"
+        },
+
+        interrogatives {
+            "what", "who", "why", "when", "how", "where"
+        },
+
+        greetings {
+            "hi", "hello", "hey"
+        }
+        ;
+};
+
+Vocabulary::Vocabulary()
+{}
+
+// user data class
+class UserData {
+    public:
+        bool greeting_given_, farewell_given_;
+        std::vector<std::string> interests_, favourites_, cached_words_;
+};
 
 ///////////////////////////////////////////////
 // sentence class
 class Sentence {
     private:
-
+    
         std::string raw_sentence_;
         std::vector<std::string> words_;
+
         unsigned long word_count_;
 
         void parse_words();
@@ -24,18 +80,22 @@ class Sentence {
         Sentence(const std::string sentence);
 
         void print_words();
+        std::vector<std::string> get_words();
+
+        unsigned long count_words();
 };
 
 // default sentence constructor
 Sentence::Sentence()
-    : raw_sentence_(""), word_count_(0)
+    : raw_sentence_(""), words_{""}, word_count_(0)
 {}
 
 // sentence constructor
 Sentence::Sentence(const std::string sentence)
-    : raw_sentence_(sentence), word_count_(0)
+    : raw_sentence_(sentence), words_{""}, word_count_(0)
 {
     parse_words();
+    print_words();
 }
 
 // get the words from a sentence and store it in a vector
@@ -49,7 +109,9 @@ void Sentence::parse_words()
     {
         if (sentence[i] != ' ')
         {
+
             word += sentence[i];
+            
         }
         else if (!word.empty())
         {
@@ -82,23 +144,69 @@ void Sentence::print_words()
     std::cout << "}\n";
 }
 
+// return the word count of the sentence
+unsigned long Sentence::count_words()
+{
+    return this->word_count_;
+}
+
+// return the parsed words vector
+std::vector<std::string> Sentence::get_words()
+{
+    return this->words_;
+}
+
 ///////////////////////////////////////////////
 // language processor class
 class LanguageProcessor {
     private:
 
-        Sentence in_sentence_, out_sentence_;
+        Vocabulary vocab_;
+
+        Sentence in_sentence_;
+        std::vector<word_class> word_classes_;
+
+        void interpret_word_classes();
 
     public:
 
         LanguageProcessor();
         
+        void process();
+        void set_sentence(Sentence sentence);
+        void get_sentence();
+        
 };
 
 // language processor constructor
 LanguageProcessor::LanguageProcessor()
-    : in_sentence_(Sentence()), out_sentence_(Sentence())
+    : vocab_(Vocabulary()), in_sentence_(Sentence())
 {}
+
+// determine the word classes of the sentence
+void LanguageProcessor::interpret_word_classes()
+{
+    std::vector<std::string> words = this->in_sentence_.get_words();
+    std::vector(std::vector&) word_classes {}
+
+    for (size_t i = 0; i < this->in_sentence_.count_words(); i++)
+    {
+        
+    }
+    
+}
+
+// process the current stored sentence
+void LanguageProcessor::process()
+{
+    std::vector<std::string> words = this->in_sentence_.get_words();
+
+    if (words[0] == "tree")
+    {
+        /* code */
+    }
+    
+}
 
 ///////////////////////////////////////////////
 // main chatbot class
@@ -108,9 +216,11 @@ class Chatbot {
         std::string bot_name_;
         std::string bot_reply_;
 
+        size_t reply_count_;
+
         Sentence user_message_;
 
-        LanguageProcessor processor_;
+        LanguageProcessor processor_ = LanguageProcessor();
 
     public:
 
@@ -127,24 +237,18 @@ class Chatbot {
 
 // default chatbot constructor
 Chatbot::Chatbot()
-    : bot_name_("Chatty"), bot_reply_(""), user_message_(Sentence())
+    : bot_name_("Chatty"), bot_reply_(""), reply_count_(0), user_message_(Sentence())
 {}
 
 // chatbot constructor with name field
 Chatbot::Chatbot(std::string name)
-    : bot_name_(name), bot_reply_(""), user_message_(Sentence())
+    : bot_name_(name), bot_reply_(""), reply_count_(0), user_message_(Sentence())
 {}
 
 // returns the chatbots name field
 std::string Chatbot::get_name()
 {
     return this->bot_name_;
-}
-
-// formulates and returns the current bot reply to the current user message
-std::string Chatbot::get_reply()
-{
-    return this->bot_reply_;
 }
 
 // set chatbots name field to something else
@@ -158,6 +262,13 @@ void Chatbot::tell(std::string msg)
 {
     this->user_message_ = Sentence(msg);
     //this->user_message_.print_words();
+}
+
+// formulates and returns the current bot reply to the current user message
+std::string Chatbot::get_reply()
+{
+    reply_count_ += 1;
+    return this->bot_reply_;
 }
 
 //
