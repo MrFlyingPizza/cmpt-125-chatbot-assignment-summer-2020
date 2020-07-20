@@ -31,7 +31,7 @@ class Vocabulary {
         },
 
         linking_verbs {
-            "is", "are", "have", "be"
+            "is", "am", "are", "was", "were", "have", "has", "had", "be", "been"
         },
 
         conjunctions {
@@ -39,7 +39,7 @@ class Vocabulary {
         },
 
         possessives {
-            "mine", "ours", "yours", "his", "hers", "its", "theirs"
+            "my", "our", "your", "his", "her", "its", "their"
         },
 
         interrogatives {
@@ -87,12 +87,12 @@ class Sentence {
 
 // default sentence constructor
 Sentence::Sentence()
-    : raw_sentence_(""), words_{""}, word_count_(0)
+    : raw_sentence_(""), words_{}, word_count_(0)
 {}
 
 // sentence constructor
 Sentence::Sentence(const std::string sentence)
-    : raw_sentence_(sentence), words_{""}, word_count_(0)
+    : raw_sentence_(sentence), words_{}, word_count_(0)
 {
     parse_words();
     print_words();
@@ -173,39 +173,94 @@ class LanguageProcessor {
         LanguageProcessor();
         
         void process();
+        void print_word_classes();
         void set_sentence(Sentence sentence);
-        void get_sentence();
+        Sentence get_sentence();
         
 };
 
 // language processor constructor
 LanguageProcessor::LanguageProcessor()
-    : vocab_(Vocabulary()), in_sentence_(Sentence())
+    : vocab_(Vocabulary()), in_sentence_(Sentence()), word_classes_{}
 {}
-
-// determine the word classes of the sentence
-void LanguageProcessor::interpret_word_classes()
-{
-    std::vector<std::string> words = this->in_sentence_.get_words();
-    std::vector(std::vector&) word_classes {}
-
-    for (size_t i = 0; i < this->in_sentence_.count_words(); i++)
-    {
-        
-    }
-    
-}
 
 // process the current stored sentence
 void LanguageProcessor::process()
 {
-    std::vector<std::string> words = this->in_sentence_.get_words();
-
-    if (words[0] == "tree")
+    print_word_classes();
+    
+    if (this->in_sentence_.count_words() >= 3)
+    {
+        /* code */
+    }
+    else
     {
         /* code */
     }
     
+}
+
+// determine the word classes of the current sentence, clears previous values
+void LanguageProcessor::interpret_word_classes()
+{
+    std::vector<std::string> words = this->in_sentence_.get_words();
+    this->word_classes_.clear();
+
+    for (size_t i = 0; i < this->in_sentence_.count_words(); i++)
+    {
+        this->word_classes_.push_back(UNKNOWN);
+        // check for article
+        for (std::string word: this->vocab_.articles)
+        {
+            if (word == words[i]) this->word_classes_[i] = ARTICLE;
+        }
+        // check for linking verb
+        for (std::string word: this->vocab_.linking_verbs)
+        {
+            if (word == words[i]) this->word_classes_[i] = LINKING_VERB;
+        }
+        // check for interrogatives
+        for (std::string word: this->vocab_.interrogatives)
+        {
+            if (word == words[i]) this->word_classes_[i] = INTERROGATIVE;
+        }
+        // check for pronouns
+        for (std::string word : this->vocab_.pronouns)
+        {
+            if (word == words[i]) this->word_classes_[i] = PRONOUN;
+        }
+        // check for possessives
+        for (std::string word : this->vocab_.possessives)
+        {
+            if (word == words[i]) this->word_classes_[i] = POSSESSIVE;
+        }
+        // check for conjunctions
+        for (std::string word : this->vocab_.conjunctions)
+        {
+            if (word == words[i]) this->word_classes_[i] = CONJUNCTION;
+        }
+
+    }
+    
+}
+
+// set the sentence to be processed
+void LanguageProcessor::set_sentence(Sentence sentence)
+{
+    this->in_sentence_ = sentence;
+    interpret_word_classes();
+}
+
+// print the identified word classes
+void LanguageProcessor::print_word_classes()
+{
+    std::cout << "{ ";
+    for (word_class current : this->word_classes_)
+    {
+        std::cout << current;
+        std::cout << " ";
+    }
+    std::cout << "}\n";
 }
 
 ///////////////////////////////////////////////
@@ -261,6 +316,8 @@ void Chatbot::set_name(std::string name)
 void Chatbot::tell(std::string msg)
 {
     this->user_message_ = Sentence(msg);
+    this->processor_.set_sentence(this->user_message_);
+    this->processor_.process();
     //this->user_message_.print_words();
 }
 
