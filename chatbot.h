@@ -8,71 +8,183 @@
 #include <iostream>
 #include <algorithm>
 #include <ctype.h>
+#include <array>
+#include <map>
 
 // set of classes to identify the words in a sentence from the user
 enum word_class {
-    UNKNOWN, NOUN, PRONOUN, ARTICLE, LINKING_VERB, CONJUNCTION, POSSESSIVE, INTERROGATIVE
+    UNKN, NOUN, PNUN, RTCL, LVRB, CONJ, POSS, INTR, VERB, PREP, TEMP
 };
+
+// insert a string into the char placeholder of another string
+std::string insert_at_placeholder(std::string orig, std::string content, char placeholder)
+{
+    std::string new_str = "";
+    for (char ch : orig)
+    {
+        if (ch == placeholder)
+        {
+            new_str += content;
+        }
+        else
+        {
+            new_str += ch;
+        }
+        
+    }
+    return new_str;
+}
+
+// get keys from a map
+std::vector<std::vector<word_class>> get_pattern_keys(std::map<std::vector<word_class>, std::vector<std::string>> map_obj)
+{
+    std::vector<std::vector<word_class>> keys;
+    for (std::map<std::vector<word_class>, std::vector<std::string>>::iterator iter = map_obj.begin(); iter != map_obj.end(); ++iter)
+    {
+        keys.push_back(iter->first);
+    }
+    return keys;
+}
+
+// slice word_class vector
+std::vector<word_class> slice(std::vector<word_class> orig, size_t front, size_t back)
+{
+    auto start = orig.begin();
+    auto end = orig.end();
+
+    std::vector<word_class> sliced(back - front + 1);
+    std::copy(start, end, sliced.begin());
+
+    return sliced;
+}
+
+// get a random string from a supplied vector
+std::string get_random_item(std::vector<std::string> items)
+{
+    int rand_num = rand() % items.size();
+
+    return items[rand_num];
+}
+
+// limited random number generator
+unsigned int limited_rand()
+{
+    return rand() % 100 + 1;
+}
+
+// find a string in a vector and return the index
+int find(std::vector<std::string> items, std::string item)
+{
+    int i = 0;
+    bool found = false;
+    while (i < (int) items.size() && !found)
+    {
+        if (items[i] == item)
+        {
+            found = true;
+        }
+        else
+        {
+            ++i;
+        }
+        
+    }
+    if (!found)
+    {
+        i = -1;
+    }
+    return i;
+}
 
 ///////////////////////////////////////////////
 // language data class
 class Vocabulary {
     public:
 
-        Vocabulary();
+        static std::vector<std::string>
+        pronouns,
 
-        const std::vector<std::string>
-        pronouns {
-            "i", "you", "he", "she", "we", "they", "it", "us", "me"
-        },
+        articles,
 
-        articles {
-            "a", "an", "the"
-        },
+        linking_verbs,
 
-        linking_verbs {
-            "is", "am", "are", "was", "were", "have", "has", "had", "be", "been"
-        },
+        conjunctions,
 
-        conjunctions {
-            "and", 
-        },
+        possessives,
 
-        possessives {
-            "my", "our", "your", "his", "her", "its", "their"
-        },
+        interrogatives,
 
-        interrogatives {
-            "what", "who", "why", "when", "how", "where"
-        },
+        prepositions,
 
-        greetings {
-            "hi", "hello", "hey"
-        }
+        greetings
         ;
 };
 
-Vocabulary::Vocabulary()
-{}
+// vocabulary definitions
+std::vector<std::string> Vocabulary::pronouns {
+    "i", "you", "he", "she", "we", "they", "it", "us", "me"
+},
 
+Vocabulary::articles {
+    "a", "an", "the"
+},
+
+Vocabulary::linking_verbs {
+    "is", "am", "are", "was", "were", "have", "has", "had", "be", "been"
+},
+
+Vocabulary::conjunctions {
+    "and", "for", "or"
+},
+
+Vocabulary::possessives {
+    "my", "our", "your", "his", "her", "its", "their"
+},
+
+Vocabulary::interrogatives {
+    "what", "who", "why", "when", "how", "where"
+},
+
+Vocabulary::prepositions {
+    "of"
+},
+
+Vocabulary::greetings {
+    "hi", "hello", "hey"
+};
+
+///////////////////////////////////////////////
 // user data class
 class UserData {
     public:
         bool greeting_given_, farewell_given_;
-        std::vector<std::string> interests_, favourites_, cached_words_;
+        std::vector<std::string> cached_words_;
+
+        unsigned int greeting_count = 0;
+
+        UserData();
 };
+
+// user constructor
+UserData::UserData()
+    : greeting_given_(false), farewell_given_(false)
+{}
 
 ///////////////////////////////////////////////
 // sentence class
 class Sentence {
     private:
-    
+
         std::string raw_sentence_;
         std::vector<std::string> words_;
+        std::vector<word_class> word_classes_;
+        std::vector<word_class> condensed_word_classes_;
 
         unsigned long word_count_;
 
         void parse_words();
+        void interpret_word_classes();
+        void interpret_condensed_word_classes();
 
     public:
 
@@ -80,22 +192,38 @@ class Sentence {
         Sentence(const std::string sentence);
 
         void print_words();
+        void print_word_classes(unsigned short choice);
+
         std::vector<std::string> get_words();
 
         unsigned long count_words();
+        std::vector<word_class> get_classes(unsigned short choice);
 };
 
 // default sentence constructor
 Sentence::Sentence()
-    : raw_sentence_(""), words_{}, word_count_(0)
+    : raw_sentence_(""), words_{}, word_classes_{}, condensed_word_classes_{}, word_count_(0)
 {}
 
 // sentence constructor
 Sentence::Sentence(const std::string sentence)
-    : raw_sentence_(sentence), words_{}, word_count_(0)
+    : raw_sentence_(sentence), words_{}, word_classes_{}, condensed_word_classes_{}, word_count_(0)
 {
     parse_words();
+    interpret_word_classes();
+    interpret_condensed_word_classes();
     print_words();
+}
+
+// get the word classes of the sentence
+std::vector<word_class> Sentence::get_classes(unsigned short choice)
+{
+    std::vector<word_class> selected_word_classes = this->word_classes_;
+    if (choice == 1)
+    {
+        selected_word_classes = this->condensed_word_classes_;
+    }
+    return selected_word_classes;
 }
 
 // get the words from a sentence and store it in a vector
@@ -144,6 +272,21 @@ void Sentence::print_words()
     std::cout << "}\n";
 }
 
+// neatly print the word classes of the sentence
+// print the identified word classes
+void Sentence::print_word_classes(unsigned short choice)
+{
+    std::vector<word_class> classes = this->word_classes_;
+    if (choice == 1) classes = this->condensed_word_classes_;
+    std::cout << "{ ";
+    for (word_class current : classes)
+    {
+        std::cout << current;
+        std::cout << " ";
+    }
+    std::cout << "}\n";
+}
+
 // return the word count of the sentence
 unsigned long Sentence::count_words()
 {
@@ -156,111 +299,284 @@ std::vector<std::string> Sentence::get_words()
     return this->words_;
 }
 
+// determine the word classes of the current sentence, clears previous values
+void Sentence::interpret_word_classes()
+{
+    for (size_t i = 0; i < this->word_count_; i++)
+    {
+        this->word_classes_.push_back(UNKN);
+        // check for article
+        for (std::string word: Vocabulary::articles)
+        {
+            if (word == this->words_[i]) this->word_classes_[i] = RTCL;
+        }
+        // check for linking verb
+        for (std::string word: Vocabulary::linking_verbs)
+        {
+            if (word == this->words_[i]) this->word_classes_[i] = LVRB;
+        }
+        // check for interrogatives
+        for (std::string word: Vocabulary::interrogatives)
+        {
+            if (word == this->words_[i]) this->word_classes_[i] = INTR;
+        }
+        // check for pronouns
+        for (std::string word : Vocabulary::pronouns)
+        {
+            if (word == this->words_[i]) this->word_classes_[i] = PNUN;
+        }
+        // check for possessives
+        for (std::string word : Vocabulary::possessives)
+        {
+            if (word == this->words_[i]) this->word_classes_[i] = POSS;
+        }
+        // check for conjunctions
+        for (std::string word : Vocabulary::conjunctions)
+        {
+            if (word == this->words_[i]) this->word_classes_[i] = CONJ;
+        }
+
+        // check for prepositions
+        for (std::string word : Vocabulary::prepositions)
+        {
+            if (word == this->words_[i]) this->word_classes_[i] = PREP;
+        }
+
+    }
+    
+}
+
+// further deduct the sentence structure
+void Sentence::interpret_condensed_word_classes()
+{
+    word_class temp = TEMP;
+    for (word_class current : this->word_classes_)
+    {
+        if (current != temp)
+        {
+            temp = current;
+            this->condensed_word_classes_.push_back(temp);
+        }
+        
+    }
+    
+}
+
 ///////////////////////////////////////////////
 // language processor class
 class LanguageProcessor {
     private:
 
-        Vocabulary vocab_;
+        UserData user_;
 
-        Sentence in_sentence_;
-        std::vector<word_class> word_classes_;
+        Sentence message_;
+        std::string response_;
 
-        void interpret_word_classes();
+        void evaluate_greater();
+        void evaluate_lesser();
+
+        static std::map<std::vector<word_class>, std::vector<std::string>> pattern_map;
+        static std::vector<std::string>
+        
+        // formulated replys
+        greeted_msg_,
+
+        // reply components
+        greetings_,
+
+        initiate_,
+
+        provoke_,
+
+        excessive_greeting;
+
 
     public:
 
         LanguageProcessor();
         
         void process();
-        void print_word_classes();
         void set_sentence(Sentence sentence);
-        Sentence get_sentence();
+        std::string get_response();
+        void clear();
+
+        std::string get_reply;
         
 };
 
+std::map<std::vector<word_class>, std::vector<std::string>>
+LanguageProcessor::pattern_map {
+    {std::vector<word_class>{PNUN, UNKN}, std::vector<std::string>{
+        "1", "2"
+        }
+    }
+
+};
+
+std::vector<std::string>
+LanguageProcessor::greeted_msg_ {
+    "We've already met.",
+    "We know eachother already.",
+    "We've met",
+    "We know eachother.",
+    "I know you already.",
+    "No need to greet me again.",
+},
+
+// reply components
+LanguageProcessor::greetings_ {
+    "Hi",
+    "Hi there",
+    "Hello",
+    "Hello there",
+    "Good day",
+    "Nice to see you",
+    "Hey",
+    "Hey there",
+},
+
+LanguageProcessor::initiate_ {
+    "What are you up to?",
+    "What brings you here?",
+    "What's on your mind?",
+    "What do you need?",
+    "I'm curious, tell me about yourself.",
+},
+
+LanguageProcessor::provoke_ {
+    "I'm curious, tell me about yourself.",
+    "Let's talk about something",
+
+},
+
+LanguageProcessor::excessive_greeting {
+    "Are you just gonna keep saying hi to me?",
+    "Quit saying hi, let's talk about something interesting.",
+    "I've met you already now stop greeting me.",
+    "Do you ever stop saying hi?",
+    "Let's start talking about interesting stuff.",
+    "There's more to life than just greeting people you know.",
+    "Hello for the 9 million-th time? Let's talk about stuff already."
+}
+;
+
 // language processor constructor
 LanguageProcessor::LanguageProcessor()
-    : vocab_(Vocabulary()), in_sentence_(Sentence()), word_classes_{}
+    : user_(UserData()), message_()
 {}
 
 // process the current stored sentence
 void LanguageProcessor::process()
 {
-    print_word_classes();
+    this->message_.print_word_classes(0);
+    this->message_.print_word_classes(1);
     
-    if (this->in_sentence_.count_words() >= 3)
+    if (this->message_.count_words() >= 3)
     {
-        /* code */
+        evaluate_greater();
     }
     else
     {
-        /* code */
+        evaluate_lesser();
     }
     
 }
 
-// determine the word classes of the current sentence, clears previous values
-void LanguageProcessor::interpret_word_classes()
+// evaluate sentences 3 words or longer through pattern matching of condensed word classes
+void LanguageProcessor::evaluate_greater()
 {
-    std::vector<std::string> words = this->in_sentence_.get_words();
-    this->word_classes_.clear();
+    std::vector<std::vector<word_class>> keys = get_pattern_keys(LanguageProcessor::pattern_map);
+    std::vector<word_class> key = keys[0];
+    std::string response, cached_word, response_template;
 
-    for (size_t i = 0; i < this->in_sentence_.count_words(); i++)
+    unsigned int count = 0;
+    bool matched;
+    // tests the condensed word classes until it doesnt match or it matches one of the patterns
+    // the response to the user is selected randomly from the mapped responses
+    while (!matched && count < key.size())
     {
-        this->word_classes_.push_back(UNKNOWN);
-        // check for article
-        for (std::string word: this->vocab_.articles)
+        if (key == this->message_.get_classes(1))
         {
-            if (word == words[i]) this->word_classes_[i] = ARTICLE;
+            response_template = get_random_item(pattern_map.at(key));
+            matched = true;
+            response = insert_at_placeholder(response_template, cached_word, '|');
         }
-        // check for linking verb
-        for (std::string word: this->vocab_.linking_verbs)
+        ++count;
+    }
+    
+}
+
+// evaluate sentences less than 3 words
+void LanguageProcessor::evaluate_lesser()
+{
+    std::vector<std::string> words = this->message_.get_words();
+    std::vector<word_class> current_word_classes = this->message_.get_classes(0);
+
+    // check for greeting words
+    bool is_greeting = false;
+    for (std::string word : words)
+    {
+        if (find(Vocabulary::greetings, word) > -1)
         {
-            if (word == words[i]) this->word_classes_[i] = LINKING_VERB;
+            is_greeting = true;
         }
-        // check for interrogatives
-        for (std::string word: this->vocab_.interrogatives)
+        
+    }
+    
+    if (is_greeting)
+    {
+        // check if the user has been greeted or not
+        this->user_.greeting_count++;
+        if (this->user_.greeting_given_)
         {
-            if (word == words[i]) this->word_classes_[i] = INTERROGATIVE;
+            // respond if user says hi too many times
+            if (this->user_.greeting_count > 3)
+            {
+                this->response_ = get_random_item(this->excessive_greeting);
+            }
+            else
+            {
+                if (limited_rand() > 80)
+                {
+                    this->response_ = get_random_item(this->greetings_) + ", again.";
+                }
+                else
+                {
+                    this->response_ = get_random_item(this->greeted_msg_);
+                }
+
+            }
+            
         }
-        // check for pronouns
-        for (std::string word : this->vocab_.pronouns)
+        else
         {
-            if (word == words[i]) this->word_classes_[i] = PRONOUN;
-        }
-        // check for possessives
-        for (std::string word : this->vocab_.possessives)
-        {
-            if (word == words[i]) this->word_classes_[i] = POSSESSIVE;
-        }
-        // check for conjunctions
-        for (std::string word : this->vocab_.conjunctions)
-        {
-            if (word == words[i]) this->word_classes_[i] = CONJUNCTION;
+            this->user_.greeting_given_ = true;
+            this->response_ = get_random_item(this->greetings_) + "! " + get_random_item(this->initiate_);
+
         }
 
     }
     
 }
+
 
 // set the sentence to be processed
 void LanguageProcessor::set_sentence(Sentence sentence)
 {
-    this->in_sentence_ = sentence;
-    interpret_word_classes();
+    this->message_ = sentence;
 }
 
-// print the identified word classes
-void LanguageProcessor::print_word_classes()
+// get the formulated reply
+std::string LanguageProcessor::get_response()
 {
-    std::cout << "{ ";
-    for (word_class current : this->word_classes_)
-    {
-        std::cout << current;
-        std::cout << " ";
-    }
-    std::cout << "}\n";
+    return this->response_;
+}
+
+// clear current data
+void LanguageProcessor::clear()
+{
+    this->message_ = Sentence();
+    this->response_ = "";
 }
 
 ///////////////////////////////////////////////
@@ -269,7 +585,6 @@ class Chatbot {
     private:
 
         std::string bot_name_;
-        std::string bot_reply_;
 
         size_t reply_count_;
 
@@ -292,12 +607,12 @@ class Chatbot {
 
 // default chatbot constructor
 Chatbot::Chatbot()
-    : bot_name_("Chatty"), bot_reply_(""), reply_count_(0), user_message_(Sentence())
+    : bot_name_("Chatty"), reply_count_(0), user_message_(Sentence())
 {}
 
 // chatbot constructor with name field
 Chatbot::Chatbot(std::string name)
-    : bot_name_(name), bot_reply_(""), reply_count_(0), user_message_(Sentence())
+    : bot_name_(name), reply_count_(0), user_message_(Sentence())
 {}
 
 // returns the chatbots name field
@@ -315,6 +630,7 @@ void Chatbot::set_name(std::string name)
 // give the chatbot the user's current message
 void Chatbot::tell(std::string msg)
 {
+    this->processor_.clear();
     this->user_message_ = Sentence(msg);
     this->processor_.set_sentence(this->user_message_);
     this->processor_.process();
@@ -325,7 +641,8 @@ void Chatbot::tell(std::string msg)
 std::string Chatbot::get_reply()
 {
     reply_count_ += 1;
-    return this->bot_reply_;
+
+    return this->processor_.get_response();
 }
 
 //
