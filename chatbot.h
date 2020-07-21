@@ -388,7 +388,12 @@ class LanguageProcessor {
 
         provoke_,
 
-        excessive_greeting;
+        excessive_greeting_,
+
+        display_interest_,
+
+        refuse_answer_
+        ;
 
 
     public:
@@ -407,7 +412,24 @@ class LanguageProcessor {
 std::map<std::vector<word_class>, std::vector<std::string>>
 LanguageProcessor::pattern_map {
     {std::vector<word_class>{PNUN, UNKN}, std::vector<std::string>{
-        "1", "2"
+        "Tell me more about |",
+        "I'm curious to hear more about |",
+        "Oh, |, tell me more.",
+        "Is | really what you need?",
+        "| must be really important.",
+        "|, I don't remember the last time I wanted |.",
+        "I'm curious about |."
+        }
+    },
+
+    {std::vector<word_class>{INTR, LVRB, PNUN}, std::vector<std::string>{
+        "We are currently talking about you, not me.",
+        "Don't get curious about me, I have nothing to tell you.",
+        "Don't get curious about me",
+        "I have nothing to tell you.",
+        "We are talking about you right now.",
+        "I'm not telling you that.",
+        "I won't tell you that."
         }
     }
 
@@ -445,11 +467,12 @@ LanguageProcessor::initiate_ {
 
 LanguageProcessor::provoke_ {
     "I'm curious, tell me about yourself.",
-    "Let's talk about something",
+    "Let's talk about something.",
+    "What is something you like?",
 
 },
 
-LanguageProcessor::excessive_greeting {
+LanguageProcessor::excessive_greeting_ {
     "Are you just gonna keep saying hi to me?",
     "Quit saying hi, let's talk about something interesting.",
     "I've met you already now stop greeting me.",
@@ -457,6 +480,25 @@ LanguageProcessor::excessive_greeting {
     "Let's start talking about interesting stuff.",
     "There's more to life than just greeting people you know.",
     "Hello for the 9 million-th time? Let's talk about stuff already."
+},
+
+LanguageProcessor::display_interest_ {
+    "Cool.",
+    "Interesting.",
+    "Nice to know.",
+    "Good to know.",
+    "Really?"
+},
+
+LanguageProcessor::refuse_answer_ {
+    "I don't know enough to tell you about it.",
+    "I don't want to tell you.",
+    "Ask someone else, not me.",
+    "I'm not answering that question",
+    "Why do you want to know?",
+    "Well, I have no clue.",
+    "Well, I don't know.",
+    "What are we talking about again?"
 }
 ;
 
@@ -486,24 +528,48 @@ void LanguageProcessor::process()
 void LanguageProcessor::evaluate_greater()
 {
     std::vector<std::vector<word_class>> keys = get_pattern_keys(LanguageProcessor::pattern_map);
-    std::vector<word_class> key = keys[0];
-    std::string response, cached_word, response_template;
+    std::vector<word_class> key;
+    std::string cached_word, response_template;
 
     unsigned int count = 0;
-    bool matched;
+    bool matched = false;
     // tests the condensed word classes until it doesnt match or it matches one of the patterns
     // the response to the user is selected randomly from the mapped responses
-    while (!matched && count < key.size())
+    // the behaviour of forming the response is defined in this method
+    while (!matched && count < keys.size())
     {
-        if (key == this->message_.get_classes(1))
+        //std::cout << key[0] << key[1] << key[2];
+        key = keys[count];
+        if (key == message_.get_classes(1))
         {
-            response_template = get_random_item(pattern_map.at(key));
             matched = true;
-            response = insert_at_placeholder(response_template, cached_word, '|');
+            if (std::vector<word_class>{INTR, LVRB, PNUN} == key)
+            {
+                std::cout << "matched\n";
+                if (message_.get_words()[2] == "you")
+                {
+                    this->response_ = get_random_item(pattern_map.at(key));
+                }
+                
+            }
+            else if (std::vector<word_class>{PNUN, UNKN} == key)
+            {
+                response_template = get_random_item(pattern_map.at(key));
+                cached_word = message_.get_words()[message_.count_words() - 1];
+                user_.cached_words_.push_back(cached_word);
+                response_ = insert_at_placeholder(response_template, cached_word, '|');
+            }
+            
         }
         ++count;
     }
+
+    if (!matched)
+    {
+        response_ = get_random_item(this->provoke_);
+    }
     
+
 }
 
 // evaluate sentences less than 3 words
@@ -532,7 +598,7 @@ void LanguageProcessor::evaluate_lesser()
             // respond if user says hi too many times
             if (this->user_.greeting_count > 3)
             {
-                this->response_ = get_random_item(this->excessive_greeting);
+                this->response_ = get_random_item(this->excessive_greeting_);
             }
             else
             {
@@ -556,6 +622,11 @@ void LanguageProcessor::evaluate_lesser()
         }
 
     }
+    else if (message_.get_classes(1) == std::vector<word_class> {UNKN})
+    {
+        /* code */
+    }
+    
     
 }
 
